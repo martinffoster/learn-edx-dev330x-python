@@ -35,8 +35,8 @@ def parse_command_line():
     
     parser = argparse.ArgumentParser()
     parser.add_argument('infile', action = 'store', type = str, help = 'input file to be encrypted or decrypted')
-    parser.add_argument('-o', '--outfile', dest = 'outfile_path', action = 'store', type = str, help = 'output file')
-    parser.add_argument('-k', '--key', action = 'store', type = str, help = 'encryption/decryption key (must be positive) (default = 1)')
+    parser.add_argument('-o', '--outfile', metavar = 'outfile_path', action = 'store', type = str, help = 'output file')
+    parser.add_argument('-k', '--key', action = 'store', type = int, default = 1, help = 'encryption/decryption key (must be positive) (default = 1)')
     parser.add_argument('-d', '--decrypt', action = 'store_true', help = 'decrypt the input file')
     parser.add_argument('-a', '--all', action = 'store_true', help = 'decrypt using all keys [1, 25], save outputs in different files. (useful in case the key is lost or unknown)')
     parser.add_argument('-v', '--verbose', action = 'store_true', help = 'verbose mode')
@@ -58,15 +58,14 @@ def read_file(file_path):
         message: content of file in file_path as a string
     """
     
-    #TODO: Your code goes here
     message = str()
                         
     try:
         with open(file_path, 'r') as file:
-            message += file.readline()
+            message = file.read()
                         
     except Exception as exception_object:
-        print("Unexpected exception", exception_object)
+        print("Read: Unexpected exception", exception_object)
                         
     return(message)
                         
@@ -85,8 +84,14 @@ def write_file(message, file_path):
         None
     """
     
-    #TODO: Your code goes here
-    pass
+    try:
+        with open(file_path, 'w') as file:
+            file.write(message)
+                        
+    except Exception as exception_object:
+        print("Write: Unexpected exception", exception_object)
+                        
+    return(message)
 
 def transform(message, key, decrypt):
     """
@@ -132,9 +137,16 @@ def transform(message, key, decrypt):
             "deal"    
         
     """
-    
-    #TODO: Your code goes here
-    pass
+    transformed_message = str()
+    if decrypt:
+        key = -key
+           
+    for c in message:
+        #print("in: '{}' out: '{}'".format(c, shift(c, key)))
+        transformed_message += str(shift(c, key))
+        
+    return transformed_message
+        
  
 def shift(char, key):    
     """
@@ -175,6 +187,8 @@ def shift(char, key):
             return shifted_char.upper()
         else:
             return shifted_char
+    else:
+        return char
 
 def main():
     # parse command line arguments
