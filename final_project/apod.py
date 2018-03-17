@@ -72,13 +72,13 @@ def create_date(datelist, surprise):
     d = date()
     if(datelist != []):
         try:
-            d = datetime.date(datelist[0], datelist[1], datelist[2])
+            d = datetime.date(datelist[2], datelist[0], datelist[1])
         except ValueError as ve:
             return None
 
     elif((datelist == []) and (surprise)):
         td = timedelta(date.today - day1)
-        
+
         
 
     
