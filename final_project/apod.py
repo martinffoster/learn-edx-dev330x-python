@@ -69,10 +69,9 @@ def create_date(datelist, surprise):
     day1 = date("1995", "06", "16")
 
     # datelist not empty?
-    d = date()
     if(datelist != []):
         try:
-            d = datetime.date(datelist[2], datelist[0], datelist[1])
+            d = date(datelist[2], datelist[0], datelist[1])
         except ValueError as ve:
             return None
 
