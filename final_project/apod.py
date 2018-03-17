@@ -33,7 +33,15 @@ def parse_command_line():
     """
     
     #TODO: Your code goes here
-    pass
+    parser = argparse.ArgumentParser()
+
+    parser.add_argument('-d', '--date', nargs = 3, metavar = ("month", "day", "year"), action = 'store', type = str, help = 'formatted date (i.e. 03 28 1998)')
+    parser.add_argument('-s', '--surprise',action = 'store_true', help = 'select a random date for a surprise image')
+    parser.add_argument('-k', '--api_key', action = 'store', type=str, help = 'NASA developer key')
+    parser.add_argument('-v', '--verbose', action = 'store_true', help = 'verbose mode')
+
+    args = parser.parse_args()
+    return args
 
 def create_date(datelist, surprise):
     """
@@ -58,9 +66,22 @@ def create_date(datelist, surprise):
     returns:
         created valid date object or None when date selected by user is invalid (i.e. in the future)
     """
+    day1 = date("1995", "06", "16")
+
+    # datelist not empty?
+    d = date()
+    if(datelist != []):
+        try:
+            d = datetime.date(datelist[0], datelist[1], datelist[2])
+        except ValueError as ve:
+            return None
+
+    elif((datelist == []) and (surprise)):
+        td = timedelta(date.today - day1)
+        
+        
+
     
-    #TODO: Your code goes here
-    pass
 
     
 def query_url(d, api_key):
