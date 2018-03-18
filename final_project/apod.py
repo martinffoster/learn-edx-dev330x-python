@@ -35,7 +35,7 @@ def parse_command_line():
     #TODO: Your code goes here
     parser = argparse.ArgumentParser()
 
-    parser.add_argument('-d', '--date', nargs = 3, metavar = ("month", "day", "year"), action = 'store', type = str, help = 'formatted date (i.e. 03 28 1998)')
+    parser.add_argument('-d', '--date', nargs = 3, metavar = ("month", "day", "year"), action = 'store', type = int, help = 'formatted date (i.e. 03 28 1998)')
     parser.add_argument('-s', '--surprise',action = 'store_true', help = 'select a random date for a surprise image')
     parser.add_argument('-k', '--api_key', action = 'store', type=str, help = 'NASA developer key')
     parser.add_argument('-v', '--verbose', action = 'store_true', help = 'verbose mode')
@@ -66,19 +66,32 @@ def create_date(datelist, surprise):
     returns:
         created valid date object or None when date selected by user is invalid (i.e. in the future)
     """
-    day1 = date("1995", "06", "16")
+    day1 = date(1995, 6, 16)
 
     # datelist not empty?
-    if(datelist != []):
+    #print("datelist is: {}".format(datelist))
+    if(datelist is not None):
         try:
             d = date(datelist[2], datelist[0], datelist[1])
+            #print("date is: {}".format(d))
+            return d
+
         except ValueError as ve:
+            #print("date is WRONG: None")
             return None
 
-    elif((datelist == []) and (surprise)):
-        td = timedelta(date.today - day1)
-
+    elif((datelist is None) and (surprise)):
+        td = date.today() - day1
+        diff = randint(0, td.days)
+        d = date.today() - timedelta(days=diff)
         
+        #print("random is: {}".format(d))
+        return d
+
+    else:
+        d = date.today() - timedelta(days=1)
+        #print("yesterday is: {}".format(d))
+        return d
 
     
 
@@ -110,9 +123,9 @@ def query_url(d, api_key):
         d is a date object representing Jul 19 1999
         query_url(d, "ABCDEFG") ==> returns https://api.nasa.gov/planetary/apod?api_key=ABCDEFG&date=1999-07-19
     """
-        
-    #TODO: Your code goes here
-    pass
+    #print("query_url got: {}, {}", d, api_key)
+    s = "https://api.nasa.gov/planetary/apod?api_key={}&date={}"
+    return s.format(api_key, d.strftime("%Y-%m-%d"))
 
 
 def save_image(d, image):
@@ -137,10 +150,29 @@ def save_image(d, image):
         if d = 1998-4-15, the image will be saved as: 1998/4/1998-4-15.jpg
     """
     
-    #TODO: Your code goes here
-    pass
+    cwd = os.getcwd()
+    py = cwd + d.strftime("/%Y")
+    pm = py + d.strftime("/%m")
 
-    
+    if (not os.path.isdir(pm)):
+        try:
+            os.makedirs(pm)
+        except Exception as e:
+            print("error creating {}: {}".format(pm, e))
+            return None
+
+    file_path = pm + d.strftime("/%Y-%m-%d.jpg")
+
+    try:
+        with open(file_path, 'wb') as file:
+            file.write(image)
+    except Exception as e:
+        print("error writing {}: {}".format(file_path,e))
+        return None
+
+    #print("wrote: "+file_path)
+    return file_path
+
     
 def request(url):
     """
@@ -204,8 +236,7 @@ def main():
     args = parse_command_line()
     
     # update API_KEY if passed on the command line
-    print(args.api_key)
-    if args.api_key != '':
+    if args.api_key:
         API_KEY = args.api_key
     
     # create a request date
